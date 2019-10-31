@@ -35,14 +35,13 @@ class SocketIOOutput(OutputChannel):
 
     async def _send_message(self, socket_id: Text, response: Any) -> None:
         """Sends a message to the recipient using the bot event."""
-
         await self.sio.emit(self.bot_message_evt, response, room=socket_id)
 
     async def send_text_message(
         self, recipient_id: Text, text: Text, **kwargs: Any
     ) -> None:
         """Send a message through this channel."""
-
+        logger.debug("send_text_message = sid={}, recipient_id{}".format(self.sid, recipient_id))
         await self._send_message(self.sid, {"text": text})
 
     async def send_image_url(
@@ -108,6 +107,7 @@ class SocketIOOutput(OutputChannel):
 
 class SocketIOInput(InputChannel):
     """A socket.io input channel."""
+    sio: AsyncServer
 
     @classmethod
     def name(cls) -> Text:
@@ -132,6 +132,7 @@ class SocketIOInput(InputChannel):
         session_persistence: bool = False,
         socketio_path: Optional[Text] = "/socket.io",
     ):
+        self.sid = None
         self.bot_message_evt = bot_message_evt
         self.session_persistence = session_persistence
         self.user_message_evt = user_message_evt
@@ -144,6 +145,7 @@ class SocketIOInput(InputChannel):
         # Workaround so that socketio works with requests from other origins.
         # https://github.com/miguelgrinberg/python-socketio/issues/205#issuecomment-493769183
         sio = AsyncServer(async_mode="sanic", cors_allowed_origins=[])
+        self.sio = sio
         socketio_webhook = SocketBlueprint(
             sio, self.socketio_path, "socketio_webhook", __name__
         )
@@ -186,10 +188,17 @@ class SocketIOInput(InputChannel):
                 sender_id = data["session_id"]
             else:
                 sender_id = sid
-
+            self.sid = sender_id
+            print(data["customData"])
+            _customData: Dict[str, str] = data["customData"]
+            print("Bu")
+            print(_customData)
             message = UserMessage(
-                data["message"], output_channel, sender_id, input_channel=self.name()
+                data["message"], output_channel, sender_id, None, input_channel=self.name(), metadata=_customData
             )
             await on_new_message(message)
 
         return socketio_webhook
+
+    def get_output_channel(self) -> Optional["OutputChannel"]:
+        return SocketIOOutput(self.sio, self.sid, self.bot_message_evt)
