@@ -1003,7 +1003,7 @@ def _get_output_channel(
     # otherwise use `CollectingOutputChannel`
     return reduce(
         lambda output_channel_created_so_far, input_channel: (
-            input_channel.get_output_channel() or output_channel_created_so_far
+            input_channel.get_output_channel(sender_id = tracker.sender_id) or output_channel_created_so_far
         ),
         matching_channels,
         CollectingOutputChannel(),

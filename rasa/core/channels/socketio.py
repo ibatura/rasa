@@ -108,7 +108,7 @@ class SocketIOOutput(OutputChannel):
 
 class SocketIOInput(InputChannel):
     """A socket.io input channel."""
-    sio: AsyncServer
+    output_channels: Dict
 
     @classmethod
     def name(cls) -> Text:
@@ -139,6 +139,7 @@ class SocketIOInput(InputChannel):
         self.user_message_evt = user_message_evt
         self.namespace = namespace
         self.socketio_path = socketio_path
+        self.output_channels = {}
 
     def blueprint(
         self, on_new_message: Callable[[UserMessage], Awaitable[Any]]
@@ -189,17 +190,17 @@ class SocketIOInput(InputChannel):
                 sender_id = data["session_id"]
             else:
                 sender_id = sid
-            self.sid = sender_id
-            print(data["customData"])
-            _customData: Dict[str, str] = data["customData"]
-            print("Bu")
-            print(_customData)
             message = UserMessage(
-                data["message"], output_channel, sender_id, None, input_channel=self.name(), metadata=_customData
+                data["message"], output_channel, sender_id, input_channel=self.name()
             )
+            self.output_channels[sender_id] = message
             await on_new_message(message)
-
         return socketio_webhook
 
-    def get_output_channel(self) -> Optional["OutputChannel"]:
-        return SocketIOOutput(self.sio, self.sid, self.bot_message_evt)
+    def get_output_channel(self, **kwargs) -> Optional["OutputChannel"]:
+        sender_id = kwargs.get("sender_id", None)
+        if sender_id is None:
+            return None
+        result = self.output_channels[sender_id]
+        return result.output_channel
+

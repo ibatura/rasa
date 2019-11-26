@@ -126,7 +126,7 @@ class InputChannel:
             )
         )
 
-    def get_output_channel(self) -> Optional["OutputChannel"]:
+    def get_output_channel(self, **kwargs) -> Optional["OutputChannel"]:
         """Create ``OutputChannel`` based on information provided by the input channel.
 
         Implementing this function is not required. If this function returns a valid
