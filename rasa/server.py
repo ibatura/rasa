@@ -984,7 +984,8 @@ def _get_output_channel(
         `OutputChannel` which should be used to return the bot's responses to.
     """
     requested_output_channel = request.args.get(OUTPUT_CHANNEL_QUERY_KEY)
-
+    logger.debug("requested_output_channel")
+    logger.debug(requested_output_channel)
     if (
         requested_output_channel == USE_LATEST_INPUT_CHANNEL_AS_OUTPUT_CHANNEL
         and tracker
@@ -1007,7 +1008,7 @@ def _get_output_channel(
         ),
         matching_channels,
         CollectingOutputChannel(),)
-    print("Output channel name ")
-    print(result.name())
+    logger.debug("Output channel name ")
+    logger.debug(result.name())
     return result
 
