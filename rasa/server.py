@@ -1001,10 +1001,13 @@ def _get_output_channel(
 
     # Check if matching channels can provide a valid output channel,
     # otherwise use `CollectingOutputChannel`
-    return reduce(
+    result = reduce(
         lambda output_channel_created_so_far, input_channel: (
             input_channel.get_output_channel(sender_id = tracker.sender_id) or output_channel_created_so_far
         ),
         matching_channels,
-        CollectingOutputChannel(),
-    )
+        CollectingOutputChannel(),)
+    print("Output channel name ")
+    print(result.name())
+    return result
+
