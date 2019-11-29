@@ -207,5 +207,7 @@ class SocketIOInput(InputChannel):
         logger.debug(self.output_channels)
         result = self.output_channels[sender_id]
         logger.debug(result)
+        if result is None:
+            return None
         return result.output_channel
 
