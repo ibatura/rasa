@@ -201,6 +201,11 @@ class SocketIOInput(InputChannel):
         sender_id = kwargs.get("sender_id", None)
         if sender_id is None:
             return None
+        logger.debug("sender_id")
+        logger.debug(sender_id)
+        logger.debug("self.output_channels")
+        logger.debug(self.output_channels)
         result = self.output_channels[sender_id]
+        logger.debug(result)
         return result.output_channel
 
