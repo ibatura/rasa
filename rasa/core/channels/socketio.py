@@ -42,8 +42,8 @@ class SocketIOOutput(OutputChannel):
         self, recipient_id: Text, text: Text, **kwargs: Any
     ) -> None:
         """Send a message through this channel."""
-        logger.debug("send_text_message = sid={}, recipient_id{}".format(self.sid, recipient_id))
-        await self._send_message(self.sid, {"text": text})
+        logger.debug("send_text_message = sid={}, recipient_id = {}".format(self.sid, recipient_id))
+        await self._send_message(recipient_id, {"text": text})
 
     async def send_image_url(
         self, recipient_id: Text, image: Text, **kwargs: Any
