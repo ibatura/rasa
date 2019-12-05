@@ -441,7 +441,10 @@ class MessageProcessor:
         for e in events:
             if not isinstance(e, BotUttered):
                 continue
-
+            logger.debug("output_channel.name()")
+            logger.debug(output_channel.name())
+            logger.debug(e)
+            logger.debug(e.message())
             await output_channel.send_response(tracker.sender_id, e.message())
 
     async def _schedule_reminders(
